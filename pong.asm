@@ -18,12 +18,22 @@ game_loop:
     xor di, di
     mov cx, 80*25
     rep stosw
-;; Draw to screen
 
+    xor di, di
+    mov ax, 0F41h
+    stosw
+;; Draw to screen
 
 ;; Player input
 
 ;; CPU input
+    ;; Delay timer to next cycle
+    mov bx, [046Ch]
+    inc bx
+    inc bx
+    .delay:
+        cmp [046Ch], bx
+        jl .delay
 
 jmp game_loop
 
