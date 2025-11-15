@@ -19,10 +19,15 @@ game_loop:
     mov cx, 80*25
     rep stosw
 
-    xor di, di
-    mov ax, 0F41h
-    stosw
-;; Draw to screen
+    ;; Draw mddle separating line
+    mov ah, 0F0h    ; White bg, black bg
+    mov di, 78      ; Start at middle of 80 character row
+    mov cl, 13      ; 'Dashed' line - only draw every other row
+    .draw_middle_loop:
+        stosw
+        add di, 320-2            ; Only draw every other row (80 Char * 2 bytes * 2 rows)
+        loop .draw_middle_loop   ; Loops CX # of times
+
 
 ;; Player input
 
