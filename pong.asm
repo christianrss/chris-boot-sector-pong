@@ -15,7 +15,7 @@ drawColor: db 0F0h
 playerY:   dw 10    ; Start player Y position 10 rows down
 cpuY:      dw 10    ; Start cpu Y position 10 rows down
 ballX:     dw 66    ; Starting ball X position
-ballY:     dw 8
+ballY:     dw 7     ; Starting ball Y position
 
 ;; LOGIC ===============
 setup_game:
@@ -35,7 +35,7 @@ game_loop:
     mov cx, 80*25
     rep stosw
 
-    ;; Draw mddle separating line
+    ;; Draw middle separating line
     mov ah, [drawColor]    ; White bg, black bg
     mov di, 78              ; Start at middle of 80 character row
     mov cx, 13                  ; 'Dashed' line - only draw every other row
@@ -44,35 +44,31 @@ game_loop:
         add di, 2*ROWLEN-2       ; Only draw every other row (80 Char * 2 bytes * 2 rows)
         loop .draw_middle_loop   ; Loops CX # of times
 
-    ;; Draw player paddle
+    ;; Draw player and CPU paddles
     imul di, [playerY], ROWLEN   ; Y position is Y # rows * length of row
-;    add di, PLAYERX
+    imul bx, [cpuY], ROWLEN
     mov cl, 5
     .draw_player_loop:
         mov [es:di+PLAYERX], ax
-;        stosw
+        mov [es:bx+CPUX], ax
         add di, ROWLEN
+        add bx, ROWLEN
         loop .draw_player_loop
-
-    ;; Draw CPU paddle
-    imul di, [cpuY], ROWLEN
-    mov cl, 5
-    .draw_cpu_loop:
-        mov [es:di+CPUX], ax
-        add di, ROWLEN
-        loop .draw_cpu_loop
 
     ;; Draw ball
     imul di, [ballY], ROWLEN
     add di, [ballX]
-    mov word [es:di], 1000h
+    mov word [es:di], 2000h     ; Green bg, black fg
 
     ;; Get Player input
 
 
-;; Player input
+    ;; Player input
 
-;; CPU input
+    ;; Move CPU
+
+    ;; Move Ball
+
     ;; Delay timer to next cycle
     mov bx, [046Ch]
     inc bx
