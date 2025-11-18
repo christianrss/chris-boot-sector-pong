@@ -9,6 +9,13 @@ VIDMEM equ 0B800h   ; Color text mode VGA memory location
 ROWLEN equ 160      ; 80 Character row * 2 bytes each
 PLAYERX equ 4       ; Player X position
 CPUX    equ 154     ; CPU X Position
+KEY_W   equ 11h     ; Keyboard scancodes...
+KEY_S   equ 1Fh
+KEY_C   equ 2Eh
+KEY_R   equ 13h
+SCREENW equ 80
+SCREENH equ 24
+PADDLEHEIGHT equ 5
 
 ;; VARIABLES ----------
 drawColor: db 0F0h
@@ -47,7 +54,7 @@ game_loop:
     ;; Draw player and CPU paddles
     imul di, [playerY], ROWLEN   ; Y position is Y # rows * length of row
     imul bx, [cpuY], ROWLEN
-    mov cl, 5
+    mov cl, PADDLEHEIGHT
     .draw_player_loop:
         mov [es:di+PLAYERX], ax
         mov [es:bx+CPUX], ax
@@ -61,11 +68,43 @@ game_loop:
     mov word [es:di], 2000h     ; Green bg, black fg
 
     ;; Get Player input
+    mov ah, 1           ; BIOS get keyboard status int 16h AH 01h
+    int 16h
+    jz move_cpu         ; No key entered, don't check, move on
 
+    cbw                 ; Zero out AH in 1 byte
+    int 16h             ; BIOS get keystroke, scancode in AH, character in AL
 
-    ;; Player input
+    cmp ah, KEY_W
+    je w_pressed
+    cmp ah, KEY_S
+    je s_pressed
+    cmp ah, KEY_C
+    je c_pressed
+    cmp ah, KEY_R
+    je r_pressed
+
+    jmp move_cpu        ; Otherwise user entered some other key, move on
+
+    ;; Move player paddle up
+    w_pressed:
+        dec word [playerY]  ; Move 1 row up
+        jge move_cpu        ; If player Y is at/above 0 (minimum Y value), then move on
+        inc word [playerY]  ; Else increment row # for collision check
+        jmp move_cpu
+
+    ;; Move player paddle down
+    s_pressed:
+        cmp word [playerY], SCREENH - PADDLEHEIGHT   ; Is player going to pass bottom of screen?
+        jg move_cpu                                  ; Yes, don'tmove
+        inc word [playerY]                           ; No, can move row down
+        jmp move_cpu
+
+    c_pressed:
+    r_pressed:
 
     ;; Move CPU
+    move_cpu:
 
     ;; Move Ball
 
