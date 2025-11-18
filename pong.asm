@@ -8,12 +8,14 @@ jmp setup_game  ; Jump over Variables section so we don't tryto execute it
 VIDMEM equ 0B800h   ; Color text mode VGA memory location
 ROWLEN equ 160      ; 80 Character row * 2 bytes each
 PLAYERX equ 4       ; Player X position
-CPUX    equ 156     ; CPU X Position
+CPUX    equ 154     ; CPU X Position
 
 ;; VARIABLES ----------
 drawColor: db 0F0h
 playerY:   dw 10    ; Start player Y position 10 rows down
-cpuY:      dw 10
+cpuY:      dw 10    ; Start cpu Y position 10 rows down
+ballX:     dw 66    ; Starting ball X position
+ballY:     dw 8
 
 ;; LOGIC ===============
 setup_game:
@@ -61,6 +63,9 @@ game_loop:
         loop .draw_cpu_loop
 
     ;; Draw ball
+    imul di, [ballY], ROWLEN
+    add di, [ballX]
+    mov word [es:di], 1000h
 
     ;; Get Player input
 
