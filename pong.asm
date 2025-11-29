@@ -105,7 +105,11 @@ game_loop:
     c_pressed:
         add byte [drawColor], 10h       ; Move to next VGA color
         jmp move_cpu
+
+    ;; Reset game to initial state
     r_pressed:
+        int 19h     ; Reloads the bootsector(in QEMU)
+
 
     ;; Move CPU
     move_cpu:
