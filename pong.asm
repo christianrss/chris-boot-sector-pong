@@ -19,6 +19,7 @@ PADDLEHEIGHT equ 5
 
 ;; VARIABLES ----------
 drawColor: db 0F0h
+
 playerY:   dw 10    ; Start player Y position 10 rows down
 cpuY:      dw 10    ; Start cpu Y position 10 rows down
 ballX:     dw 66    ; Starting ball X position
@@ -100,7 +101,10 @@ game_loop:
         inc word [playerY]                           ; No, can move row down
         jmp move_cpu
 
+    ;; Change Color of Middle line and paddles
     c_pressed:
+        add byte [drawColor], 10h       ; Move to next VGA color
+        jmp move_cpu
     r_pressed:
 
     ;; Move CPU
